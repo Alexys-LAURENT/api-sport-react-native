@@ -1,7 +1,6 @@
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.javatime.timestamp
-import java.time.LocalDateTime
 
 object Trainings : Table("trainings") {
     val idTraining = integer("id_training").autoIncrement()
@@ -24,10 +23,8 @@ data class Training(
     val idTraining: Int,
     val idUser: Int,
     val idTrainingType: Int,
-    @Serializable(with = LocalDateTimeSerializer::class)
-    val startedDate: LocalDateTime,
-    @Serializable(with = LocalDateTimeSerializer::class)
-    val endedDate: LocalDateTime?,
+    val startedDate: String,
+    val endedDate: String,
     val calories: Int?,
     val difficulty: String?,
     val feeling: String?,

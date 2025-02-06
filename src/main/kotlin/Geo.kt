@@ -1,7 +1,9 @@
+package sport.models
+
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.javatime.timestamp
-import java.time.LocalDateTime
+import java.time.Instant
 
 object Geo : Table("geo") {
     val idGeo = integer("id_geo").autoIncrement()
@@ -13,10 +15,9 @@ object Geo : Table("geo") {
 }
 
 @Serializable
-data class GeoPoint(
-    val idGeo: Int,
+data class GeoDTO(
+    val idGeo: Int = 0,
     val idTraining: Int,
-    @Serializable(with = LocalDateTimeSerializer::class)
-    val date: LocalDateTime,
-    val localization: String
+    val date: String,  // Format ISO 8601 (ex: "2024-02-06T12:00:00Z")
+    val localization: String  // JSON string des coordonnées
 )
