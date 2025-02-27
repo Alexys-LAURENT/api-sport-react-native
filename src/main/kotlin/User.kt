@@ -30,3 +30,11 @@ data class UsersLoginDTO(
     val email: String,
     val hashedPass: String
 )
+
+@Serializable
+data class LoginDTO(
+    val email: String,
+    val hashedPass: String
+)
+
+

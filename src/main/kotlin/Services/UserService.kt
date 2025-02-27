@@ -3,6 +3,7 @@ package Services
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
+import sport.models.LoginDTO
 import sport.models.Users
 import sport.models.UsersDTO
 import sport.models.UsersLoginDTO
@@ -66,4 +67,23 @@ class UserService {
     suspend fun delete(id: Int): Boolean = transaction {
         Users.deleteWhere { Users.idUser eq id } > 0
     }
+
+    suspend fun login(email: String, password: String): LoginDTO? = transaction {
+        val user = Users
+            .select { Users.email eq email }
+            .map { row ->
+                UsersLoginDTO(
+                    email = row[Users.email],
+                    hashedPass = row[Users.hashedPass]
+                )
+            }
+            .singleOrNull()
+
+        return@transaction if (user != null && user.hashedPass == password) {
+            LoginDTO(user.email, user.hashedPass) // Retourne un DTO si l'authentification est valide
+        } else {
+            null // Retourne null si l'utilisateur n'existe pas ou si le mot de passe est incorrect
+        }
+    }
+
 }

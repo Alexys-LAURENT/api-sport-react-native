@@ -7,6 +7,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import Services.UserService
 import sport.models.UsersDTO
+import sport.models.LoginDTO
 
 
 fun Application.configureUserRoutes() {
@@ -30,7 +31,6 @@ fun Application.configureUserRoutes() {
 
              }
          }
-
 
         // Route pour récupérer un utilisateur par ID
         get("/users/{id}") {
@@ -58,6 +58,27 @@ fun Application.configureUserRoutes() {
                     mapOf("error" to (e.message ?: "Erreur serveur"))
                 )
             }
+
+            route("/login") {
+                post {
+                    try {
+                        val dto = call.receive<LoginDTO>() // Récupère les données envoyées (email, password)
+                        val user = userService.login(dto.email, dto.hashedPass)
+
+                        if (user != null) {
+                            call.respond(HttpStatusCode.OK, mapOf("message" to "Connexion réussie", "user" to user))
+                        } else {
+                            call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Email ou mot de passe incorrect"))
+                        }
+                    } catch (e: Exception) {
+                        call.respond(
+                            HttpStatusCode.BadRequest,
+                            mapOf("error" to (e.message ?: "Erreur lors de la connexion"))
+                        )
+                    }
+                }
+            }
+
         }
 
     }
