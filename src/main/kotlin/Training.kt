@@ -1,3 +1,5 @@
+package sport.models
+
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.javatime.timestamp
@@ -19,7 +21,7 @@ object Trainings : Table("trainings") {
 }
 
 @Serializable
-data class Training(
+data class TrainingDTO(
     val idTraining: Int,
     val idUser: Int,
     val idTrainingType: Int,
