@@ -1,12 +1,12 @@
 package routes
 
+import Services.TrainingService
 import io.ktor.http.*
 import io.ktor.server.application.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import sport.models.TrainingDTO
-import Services.TrainingService
 
 fun Application.configureTrainingRoutes() {
     val TrainingService = TrainingService()
@@ -16,7 +16,7 @@ fun Application.configureTrainingRoutes() {
             // Récupérer un entraînement par ID
             get("{id}") {
                 val id = call.parameters["id"]?.toIntOrNull()
-                val training = id?.let { TrainingService.getAllTrainingByIdUser(it) }
+                val training = id?.let { TrainingService.getAllTrainingsByUserId(id) }
                 if (training != null) {
                     call.respond(training)
                 } else {

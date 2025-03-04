@@ -1,13 +1,12 @@
 package Services
-import Training
 import TrainingTypes
-import Trainings
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
 import sport.models.Geo
 import sport.models.GeoDTO
+import sport.models.Trainings
 import java.time.Instant
 import java.time.LocalDate
 import java.time.YearMonth

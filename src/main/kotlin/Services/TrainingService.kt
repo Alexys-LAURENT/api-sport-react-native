@@ -1,3 +1,4 @@
+package Services
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.select
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -12,8 +13,8 @@ import TrainingTypes
 data class TrainingResponse(
     val idTraining: Int,
     val calories: Int?,
-    val date: String,
-    val idTrainingType: Int,
+    val startedDate: String,
+    val endedDate: String,
     val icon: String,
     val label: String
 )
@@ -31,16 +32,16 @@ class TrainingService {
                 val idTrainingType = row[Trainings.idTrainingType]
 
                 // Récupérer les données du type de training
-                val trainingTypeData = TrainingTypes.select { TrainingType.id eq idTrainingType }
+                val trainingTypeData = TrainingTypes.select { TrainingTypes.idTrainingType eq idTrainingType }
                     .singleOrNull()
 
                 TrainingResponse(
                     idTraining = row[Trainings.idTraining],
                     calories = row[Trainings.calories],
-                    date = row[Trainings.startedDate].toString(),
-                    idTrainingType = idTrainingType,
-                    label = trainingTypeData?.get(TrainingType.label) ?: "",
-                    icon = trainingTypeData?.get(TrainingType.icon) ?: ""
+                    startedDate = row[Trainings.startedDate].toString(),
+                    endedDate = row[Trainings.endedDate]?.toString() ?: "",
+                    label = trainingTypeData?.get(TrainingTypes.label) ?: "",
+                    icon = trainingTypeData?.get(TrainingTypes.icon) ?: ""
                 )
             }
 
