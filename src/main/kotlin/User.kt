@@ -1,3 +1,5 @@
+package sport.models
+
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.Table
 
@@ -13,7 +15,7 @@ object Users : Table("users") {
 }
 
 @Serializable
-data class User(
+data class UsersDTO(
     val idUser: Int,
     val nom: String,
     val prenom: String,
@@ -21,3 +23,18 @@ data class User(
     val email: String,
     val hashedPass: String
 )
+
+@Serializable
+data class UsersLoginDTO(
+    val idUser: Int = 0,
+    val email: String,
+    val hashedPass: String
+)
+
+@Serializable
+data class LoginDTO(
+    val email: String,
+    val hashedPass: String
+)
+
+
