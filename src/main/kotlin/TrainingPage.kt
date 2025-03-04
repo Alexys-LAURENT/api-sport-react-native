@@ -31,4 +31,6 @@ data class TrainingPageDTO(
     val difficulty: String?,
     val feeling: String?,
     val distance: Float?,
+    val icon: String,
+    val label: String
 )

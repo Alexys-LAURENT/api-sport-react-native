@@ -1,5 +1,6 @@
 package Services
 
+import TrainingTypes
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import kotlinx.serialization.Serializable
@@ -16,7 +17,9 @@ class TrainingPageService {
     // Récupérer les informations d'un entraînement avec ses waypoints
     suspend fun getTrainingInfosById(idTraining: Int): TrainingWithWaypoints? = transaction {
         // D'abord, récupérer les informations de l'entraînement
-        val trainingInfo = TrainingPage.select { TrainingPage.idTraining eq idTraining }
+        val trainingInfo = (Trainings innerJoin TrainingTypes)
+            .slice(TrainingPage.columns + TrainingTypes.icon + TrainingTypes.label)
+            .select { TrainingPage.idTraining eq idTraining }
             .map { row ->
                 TrainingPageDTO(
                     idTraining = row[TrainingPage.idTraining],
@@ -27,7 +30,10 @@ class TrainingPageService {
                     calories = row[TrainingPage.calories],
                     difficulty = row[TrainingPage.difficulty],
                     feeling = row[TrainingPage.feeling],
-                    distance = row[TrainingPage.distance]
+                    distance = row[TrainingPage.distance],
+                    icon = row[TrainingTypes.icon],
+                    label = row[TrainingTypes.label]
+
                 )
             }
             .singleOrNull() ?: return@transaction null
