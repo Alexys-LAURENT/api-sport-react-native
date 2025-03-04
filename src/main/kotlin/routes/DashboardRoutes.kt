@@ -13,7 +13,8 @@ import kotlinx.serialization.Serializable
 data class DashboardMonthlyResponse(
     val calories: Int,
     val trainings: List<TrainingTypeCount>,
-    val dailyCalories: List<DailyCaloriesResponse>
+    val dailyCalories: List<DailyCaloriesResponse>,
+    val totalHours: Double
 )
 
 @Serializable
@@ -26,6 +27,11 @@ data class TrainingTypeCount(
 data class DailyCaloriesResponse(
     val date: String,
     val calories: Int
+)
+
+@Serializable
+data class MonthlyTrainingHoursResponse(
+    val totalHours: Double
 )
 
 fun Application.configureDashboardRoutes() {
@@ -60,12 +66,14 @@ fun Application.configureDashboardRoutes() {
                     val monthlyCalories = dashBoardService.getMonthlyCalories(idUser, month, year)
                     val monthlyTrainingTypes = dashBoardService.getTrainingTypesByMonth(idUser, month, year)
                     val dailyCalories = dashBoardService.getDailyCaloriesByMonth(idUser, month, year)
+                    val totalHours = dashBoardService.getTotalTrainingHoursByMonth(idUser, month, year)
 
                     // Combiner les résultats dans une seule réponse
                     val dashboardResponse = DashboardMonthlyResponse(
                         calories = monthlyCalories.calories,
                         trainings = monthlyTrainingTypes.trainings,
-                        dailyCalories = dailyCalories
+                        dailyCalories = dailyCalories,
+                        totalHours = totalHours.totalHours
                     )
 
                     // Répondre avec les données combinées
