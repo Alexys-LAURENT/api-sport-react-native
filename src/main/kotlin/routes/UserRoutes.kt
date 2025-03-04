@@ -79,6 +79,31 @@ fun Application.configureUserRoutes() {
                 }
             }
 
+
+            route("/update/{id}") {
+                post {
+                    try {
+                        val id = call.parameters["id"]?.toIntOrNull()
+                        if (id == null) {
+                            call.respond(HttpStatusCode.BadRequest, "ID invalide")
+                            return@post
+                        }
+
+                        val dto = call.receive<UsersDTO>()
+                        val isUpdated = userService.update(id, dto)
+
+                        if (isUpdated) {
+                            call.respond(HttpStatusCode.OK, "Utilisateur mis à jour avec succès")
+                        } else {
+                            call.respond(HttpStatusCode.NotFound, "Utilisateur non trouvé")
+                        }
+                    } catch (e: Exception) {
+                        call.respond(HttpStatusCode.InternalServerError, "Erreur interne du serveur : ${e.message}")
+                    }
+                }
+            }
+
+
         }
 
     }
