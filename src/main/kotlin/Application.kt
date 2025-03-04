@@ -1,6 +1,7 @@
 package sport
 
 import io.ktor.server.application.*
+import routes.configureDashboardRoutes
 import routes.configureGeoRoutes
 import routes.configureTrainingRoutes
 import routes.configureTrainingPageRoutes
@@ -14,6 +15,7 @@ fun Application.module() {
     DatabaseFactory.init()
     configureSerialization()
     configureGeoRoutes()
+    configureDashboardRoutes()
     configureTrainingRoutes()
     configureTrainingPageRoutes()
     configureUserRoutes()

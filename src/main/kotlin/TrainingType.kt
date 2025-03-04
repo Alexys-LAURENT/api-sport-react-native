@@ -5,6 +5,7 @@ object TrainingTypes : Table("training_types") {
     val idTrainingType = integer("id_training_type").autoIncrement()
     val icon = varchar("icon", 255)
     val label = varchar("label", 255)
+    val color = varchar("color", 255)
 
     override val primaryKey = PrimaryKey(idTrainingType)
 }
@@ -13,5 +14,6 @@ object TrainingTypes : Table("training_types") {
 data class TrainingType(
     val idTrainingType: Int,
     val icon: String,
-    val label: String
+    val label: String,
+    val color: String
 )
