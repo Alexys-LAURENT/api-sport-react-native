@@ -53,6 +53,7 @@ class UserService {
     }
 
 
+
     // Mettre à jour un utilisateur
     suspend fun update(id: Int, dto: UsersDTO): Boolean = transaction {
         Users.update({ Users.idUser eq id }) {
@@ -85,5 +86,6 @@ class UserService {
             null // Retourne null si l'utilisateur n'existe pas ou si le mot de passe est incorrect
         }
     }
+
 
 }

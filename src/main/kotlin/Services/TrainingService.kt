@@ -9,6 +9,7 @@ import sport.models.TrainingDTO
 import sport.models.Trainings
 import TrainingTypes
 
+
 @Serializable
 data class TrainingResponse(
     val idTraining: Int,
@@ -19,10 +20,13 @@ data class TrainingResponse(
     val label: String
 )
 
+
 @Serializable
 data class AllTrainingsResponse(
     val trainings: List<TrainingResponse>
 )
+
+
 
 class TrainingService {
     suspend fun getAllTrainingsByUserId(userId: Int): AllTrainingsResponse = transaction {

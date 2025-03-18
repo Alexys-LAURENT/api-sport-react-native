@@ -77,6 +77,19 @@ fun Application.configureUserRoutes() {
                         )
                     }
                 }
+
+                route ("/delete/{id}") {
+                    delete {
+                        val id = call.parameters["id"]?.toIntOrNull()
+
+                        if (id == null) {
+                            call.respond(HttpStatusCode.BadRequest, "ID invalide")
+                        }
+
+
+                    }
+
+                }
             }
 
 
@@ -84,6 +97,7 @@ fun Application.configureUserRoutes() {
                 post {
                     try {
                         val id = call.parameters["id"]?.toIntOrNull()
+
                         if (id == null) {
                             call.respond(HttpStatusCode.BadRequest, "ID invalide")
                             return@post
