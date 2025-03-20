@@ -20,7 +20,8 @@ fun Application.configureTrainingRoutes() {
                 if (training != null) {
                     call.respond(training)
                 } else {
-                    call.respond(HttpStatusCode.NotFound, mapOf("error" to "Entraînement non trouvé"))
+                    call.respond(HttpStatusCode.NotFound, mapOf("error" to
+                            "Entraînement non trouvé"))
                 }
             }
         }
