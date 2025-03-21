@@ -23,6 +23,27 @@ fun Application.configureTrainingRoutes() {
                     call.respond(HttpStatusCode.NotFound, mapOf("error" to "Entraînement non trouvé"))
                 }
             }
+            post("{id}/update") {
+                val id = call.parameters["id"]?.toIntOrNull()
+                if (id == null) {
+                    call.respond(HttpStatusCode.BadRequest, mapOf("error" to "ID invalide"))
+                    return@post
+                }
+
+                val updateRequest = call.receiveOrNull<UpdateTrainingRequest>()
+                if (updateRequest == null || updateRequest.difficulty.isNullOrBlank()) {
+                    call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Données invalides"))
+                    return@post
+                }
+
+                val updated = TrainingService.updateTraining(id, updateRequest.difficulty, updateRequest.feeling)
+                if (updated) {
+                    call.respond(HttpStatusCode.OK, mapOf("message" to "Entraînement mis à jour"))
+                } else {
+                    call.respond(HttpStatusCode.NotFound, mapOf("error" to "Entraînement non trouvé"))
+                }
+            }
+
         }
     }
 }

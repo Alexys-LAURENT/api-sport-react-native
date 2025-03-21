@@ -32,3 +32,9 @@ data class TrainingDTO(
     val feeling: String?,
     val distance: Float?
 )
+
+@Serializable
+data class UpdateTrainingRequest(
+    val difficulty: String,
+    val feeling: String?
+)

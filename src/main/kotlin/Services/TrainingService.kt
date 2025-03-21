@@ -47,4 +47,14 @@ class TrainingService {
 
         AllTrainingsResponse(trainings = trainingsData)
     }
+    fun updateTraining(id: Int, difficulty: String, feeling: String?): Boolean {
+        return transaction {
+            val updatedRows = Trainings.update({ Trainings.idTraining eq id }) {
+                it[Trainings.difficulty] = difficulty
+                it[Trainings.feeling] = feeling
+            }
+            updatedRows > 0
+        }
+    }
+
 }
