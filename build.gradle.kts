@@ -32,6 +32,11 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
 
+    implementation("io.ktor:ktor-server-auth:$kotlin_version")
+    implementation("io.ktor:ktor-server-auth-jwt:$kotlin_version")
+    implementation("com.auth0:java-jwt:4.4.0")
+    implementation("at.favre.lib:bcrypt:0.9.0")
+
     // Database
     implementation("org.jetbrains.exposed:exposed-core:0.41.1")
     implementation("org.jetbrains.exposed:exposed-dao:0.41.1")
