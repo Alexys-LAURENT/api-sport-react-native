@@ -94,13 +94,13 @@ fun Application.configureUserRoutes() {
 
 
             route("/update/{id}") {
-                post {
+                put {
                     try {
                         val id = call.parameters["id"]?.toIntOrNull()
 
                         if (id == null) {
                             call.respond(HttpStatusCode.BadRequest, "ID invalide")
-                            return@post
+                            return@put
                         }
 
                         val dto = call.receive<UsersDTO>()

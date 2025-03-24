@@ -26,12 +26,12 @@ data class AllTrainingsResponse(
     val trainings: List<TrainingResponse>
 )
 
-
-
 class TrainingService {
-    suspend fun getAllTrainingsByUserId(userId: Int): AllTrainingsResponse = transaction {
-        // Récupérer tous les trainings de l'utilisateur
-        val trainingsData = Trainings.select { Trainings.idUser eq userId }
+    suspend fun getAllTrainingsByUserId(userId: Int, limit: Int): AllTrainingsResponse = transaction {
+        // Récupérer tous les trainings de l'utilisateur avec une limite
+        val trainingsData = Trainings
+            .select { Trainings.idUser eq userId }
+            .limit(limit)
             .map { row ->
                 val idTrainingType = row[Trainings.idTrainingType]
 
