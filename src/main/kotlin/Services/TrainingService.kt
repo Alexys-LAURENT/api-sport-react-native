@@ -52,6 +52,7 @@ class TrainingService {
 
         AllTrainingsResponse(trainings = trainingsData)
     }
+
     suspend fun updateTraining(id: Int, difficulty: String, feeling: String?): Boolean {
         return transaction {
             val updatedRows = Trainings.update({ Trainings.idTraining eq id }) {

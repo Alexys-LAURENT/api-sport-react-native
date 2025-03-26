@@ -19,29 +19,29 @@ fun Application.configureUserRoutes() {
 
     routing {
         // Route pour crée un utilisateur
-         route("/inscription") {
-             post {
-                 try {
-                     val dto = call.receive<SignInDTO>()
-                     val created = userService.create(dto)
-                     val token = JWT.create()
-                         .withClaim("email", created.email)
-                         .withExpiresAt(Date(System.currentTimeMillis() + 60000))
-                         .sign(Algorithm.HMAC256("secretToken"))
-                     val response = SignInResponseDTO(
-                         message = "Inscription réussie",
-                         token = token
-                     )
-                     call.respond(HttpStatusCode.OK, response)
-                 }catch (e: Exception) {
-                     call.respond(
-                         HttpStatusCode.BadRequest,
-                         mapOf("error" to (e.message ?: "Erreur lors de la création"))
-                     )
-                 }
+        route("/inscription") {
+            post {
+                try {
+                    val dto = call.receive<SignInDTO>()
+                    val created = userService.create(dto)
+                    val token = JWT.create()
+                        .withClaim("email", created.email)
+                        .withExpiresAt(Date(System.currentTimeMillis() + 60000))
+                        .sign(Algorithm.HMAC256("secretToken"))
+                    val response = SignInResponseDTO(
+                        message = "Inscription réussie",
+                        token = token
+                    )
+                    call.respond(HttpStatusCode.OK, response)
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.BadRequest,
+                        mapOf("error" to (e.message ?: "Erreur lors de la création"))
+                    )
+                }
 
-             }
-         }
+            }
+        }
 
         // Route pour récupérer un utilisateur par ID
         get("/users/{id}") {
@@ -99,47 +99,45 @@ fun Application.configureUserRoutes() {
                     e.printStackTrace()
                     call.respond(HttpStatusCode.BadRequest, mapOf("error" to (e.message ?: "Erreur inconnue")))
                 }
+            }
+        }
 
-                route ("/delete/{id}") {
-                    delete {
-                        val id = call.parameters["id"]?.toIntOrNull()
+        route("/delete/{id}") {
+            delete {
+                val id = call.parameters["id"]?.toIntOrNull()
 
-                        if (id == null) {
-                            call.respond(HttpStatusCode.BadRequest, "ID invalide")
-                        }
-
-
-                    }
-
+                if (id == null) {
+                    call.respond(HttpStatusCode.BadRequest, "ID invalide")
                 }
+
+
             }
 
+        }
 
-            route("/update/{id}") {
-                put {
-                    try {
-                        val id = call.parameters["id"]?.toIntOrNull()
 
-                        if (id == null) {
-                            call.respond(HttpStatusCode.BadRequest, "ID invalide")
-                            return@put
-                        }
+        route("/update/{id}") {
+            put {
+                try {
+                    val id = call.parameters["id"]?.toIntOrNull()
 
-                        val dto = call.receive<UsersDTO>()
-                        val isUpdated = userService.update(id, dto)
-
-                        if (isUpdated) {
-                            call.respond(HttpStatusCode.OK, "Utilisateur mis à jour avec succès")
-                        } else {
-                            call.respond(HttpStatusCode.NotFound, "Utilisateur non trouvé")
-                        }
-                    } catch (e: Exception) {
-                        call.respond(HttpStatusCode.InternalServerError, "Erreur interne du serveur : ${e.message}")
+                    if (id == null) {
+                        call.respond(HttpStatusCode.BadRequest, "ID invalide")
+                        return@put
                     }
+
+                    val dto = call.receive<UsersDTO>()
+                    val isUpdated = userService.update(id, dto)
+
+                    if (isUpdated) {
+                        call.respond(HttpStatusCode.OK, "Utilisateur mis à jour avec succès")
+                    } else {
+                        call.respond(HttpStatusCode.NotFound, "Utilisateur non trouvé")
+                    }
+                } catch (e: Exception) {
+                    call.respond(HttpStatusCode.InternalServerError, "Erreur interne du serveur : ${e.message}")
                 }
             }
-
-
         }
     }
 }

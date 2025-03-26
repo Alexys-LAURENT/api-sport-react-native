@@ -7,6 +7,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.serialization.Serializable
 import sport.models.TrainingDTO
+import io.ktor.server.request.*
 
 // Ajout de la data class pour le corps de la requête
 @Serializable
@@ -44,12 +45,12 @@ fun Application.configureTrainingRoutes() {
 
                 val updateRequest = call.receive<UpdateTrainingRequest>()
                 System.out.println(updateRequest)
-                if (updateRequest == null || updateRequest.difficulty.isBlank()) {
+                if (updateRequest.difficulty.isBlank()) {
                     call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Données invalides"))
                     return@put
                 }
 
-                val updated = TrainingService.updateTraining(id, updateRequest.difficulty, updateRequest.feeling)
+                val updated = trainingService.updateTraining(id, updateRequest.difficulty, updateRequest.feeling)
                 if (updated) {
                     call.respond(HttpStatusCode.OK, mapOf("message" to "Entraînement mis à jour"))
                 } else {
