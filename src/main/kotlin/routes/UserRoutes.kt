@@ -6,8 +6,12 @@ import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import Services.UserService
-import sport.models.UsersDTO
-import sport.models.LoginDTO
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
+import io.ktor.server.auth.*
+import io.ktor.server.auth.jwt.*
+import sport.models.*
+import java.util.Date
 
 
 fun Application.configureUserRoutes() {
@@ -18,10 +22,17 @@ fun Application.configureUserRoutes() {
          route("/inscription") {
              post {
                  try {
-                     val dto = call.receive<UsersDTO>()
+                     val dto = call.receive<SignInDTO>()
                      val created = userService.create(dto)
-                     call.respond(HttpStatusCode.Created, created)
-
+                     val token = JWT.create()
+                         .withClaim("email", created.email)
+                         .withExpiresAt(Date(System.currentTimeMillis() + 60000))
+                         .sign(Algorithm.HMAC256("secretToken"))
+                     val response = SignInResponseDTO(
+                         message = "Inscription réussie",
+                         token = token
+                     )
+                     call.respond(HttpStatusCode.OK, response)
                  }catch (e: Exception) {
                      call.respond(
                          HttpStatusCode.BadRequest,
@@ -58,28 +69,37 @@ fun Application.configureUserRoutes() {
                     mapOf("error" to (e.message ?: "Erreur serveur"))
                 )
             }
-
-            route("/login") {
-                post {
-                    try {
-                        val dto = call.receive<LoginDTO>() // Récupère les données envoyées (email, password)
-                        val user = userService.login(dto.email, dto.hashedPass)
-
-                        if (user != null) {
-                            call.respond(HttpStatusCode.OK, mapOf("message" to "Connexion réussie", "user" to user))
-                        } else {
-                            call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Email ou mot de passe incorrect"))
-                        }
-                    } catch (e: Exception) {
-                        call.respond(
-                            HttpStatusCode.BadRequest,
-                            mapOf("error" to (e.message ?: "Erreur lors de la connexion"))
-                        )
-                    }
-                }
-            }
-
         }
 
+        route("/login") {
+            post {
+                try {
+                    val log = call.receive<LoginDTO>()
+                    val user = userService.login(log.email, log.hashedPass)
+                    println("Requête reçue: email=${log.email}, hashedPass=${log.hashedPass}")
+
+                    if (user != null) {
+                        println("user != null")
+                        val token = JWT.create()
+                            .withClaim("email", user.email)
+                            .withExpiresAt(Date(System.currentTimeMillis() + 60000))
+                            .sign(Algorithm.HMAC256("secretToken"))
+                        val response = LoginResponseDTO(
+                            message = "Connexion réussie",
+                            email = user.email,
+                            token = token
+                        )
+                        call.respond(HttpStatusCode.OK, response)
+                    } else {
+                        call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Email ou mot de passe incorrect"))
+                    }
+
+                    call.respond(HttpStatusCode.OK, mapOf("message" to "Connexion réussie", "email" to log.email))
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    call.respond(HttpStatusCode.BadRequest, mapOf("error" to (e.message ?: "Erreur inconnue")))
+                }
+            }
+        }
     }
 }

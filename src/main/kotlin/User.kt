@@ -25,6 +25,15 @@ data class UsersDTO(
 )
 
 @Serializable
+data class SignInDTO(
+    val nom: String,
+    val prenom: String,
+    val sexe: String,
+    val email: String,
+    val hashedPass: String
+)
+
+@Serializable
 data class UsersLoginDTO(
     val idUser: Int = 0,
     val email: String,
@@ -35,6 +44,19 @@ data class UsersLoginDTO(
 data class LoginDTO(
     val email: String,
     val hashedPass: String
+)
+
+@Serializable
+data class LoginResponseDTO(
+    val message: String,
+    val email: String,
+    val token: String
+)
+
+@Serializable
+data class SignInResponseDTO(
+    val message: String,
+    val token: String
 )
 
 

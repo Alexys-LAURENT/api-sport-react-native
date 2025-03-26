@@ -3,24 +3,22 @@ package Services
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
 import org.jetbrains.exposed.sql.transactions.transaction
-import sport.models.LoginDTO
-import sport.models.Users
-import sport.models.UsersDTO
-import sport.models.UsersLoginDTO
+import sport.models.*
+import at.favre.lib.crypto.bcrypt.BCrypt
 
 
 class UserService {
     // Créer un utilisateur
-    suspend fun create(dto: UsersDTO): UsersDTO = transaction {
+    suspend fun create(dto: SignInDTO): UsersDTO = transaction {
+        println(dto)
+        val hashedPassword = BCrypt.withDefaults().hashToString(12, dto.hashedPass.toCharArray())
         val insertStatement = Users.insert {
-            it[idUser] = dto.idUser
             it[nom] = dto.nom
             it[prenom] = dto.prenom
             it[sexe] = dto.sexe
             it[email] = dto.email
-            it[hashedPass] = dto.hashedPass
+            it[hashedPass] = hashedPassword
         }
-
         val row = insertStatement.resultedValues?.firstOrNull()
             ?: throw Exception("Échec de la création de l'utilisateur")
 
@@ -74,12 +72,12 @@ class UserService {
             .map { row ->
                 UsersLoginDTO(
                     email = row[Users.email],
-                    hashedPass = row[Users.hashedPass]
+                    hashedPass = row[Users.hashedPass],
                 )
             }
-            .singleOrNull()
-
-        return@transaction if (user != null && user.hashedPass == password) {
+            .singleOrNull() ?: return@transaction null
+        val passwordVerified = BCrypt.verifyer().verify(password.toCharArray(), user.hashedPass)
+        if (passwordVerified.verified) {
             LoginDTO(user.email, user.hashedPass) // Retourne un DTO si l'authentification est valide
         } else {
             null // Retourne null si l'utilisateur n'existe pas ou si le mot de passe est incorrect
