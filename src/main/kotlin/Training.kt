@@ -32,3 +32,4 @@ data class TrainingDTO(
     val feeling: String?,
     val distance: Float?
 )
+

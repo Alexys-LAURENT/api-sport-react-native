@@ -8,6 +8,7 @@ import kotlinx.serialization.Serializable
 import sport.models.TrainingDTO
 import sport.models.Trainings
 import TrainingTypes
+import org.jetbrains.exposed.sql.update
 
 @Serializable
 data class TrainingResponse(
@@ -46,5 +47,14 @@ class TrainingService {
             }
 
         AllTrainingsResponse(trainings = trainingsData)
+    }
+    suspend fun updateTraining(id: Int, difficulty: String, feeling: String?): Boolean {
+        return transaction {
+            val updatedRows = Trainings.update({ Trainings.idTraining eq id }) {
+                it[Trainings.difficulty] = difficulty
+                it[Trainings.feeling] = feeling
+            }
+            updatedRows > 0
+        }
     }
 }
