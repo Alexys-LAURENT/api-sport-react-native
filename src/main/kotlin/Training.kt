@@ -3,6 +3,7 @@ package sport.models
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.javatime.timestamp
+import sport.models.Users
 
 object Trainings : Table("trainings") {
     val idTraining = integer("id_training").autoIncrement()
