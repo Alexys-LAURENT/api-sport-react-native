@@ -36,13 +36,15 @@ class UserService {
     }
 
     // Récupérer un utilisateur par ID
-    suspend fun getById(id: Int): UsersLoginDTO? = transaction {
+    suspend fun getById(id: Int): UsersDTO? = transaction {
         Users
-            .slice(Users.idUser, Users.hashedPass) // Sélectionne uniquement les colonnes nécessaires
             .select { Users.idUser eq id }
             .map { row ->
-                UsersLoginDTO(
+                UsersDTO(
                     idUser = row[Users.idUser],
+                    nom = row[Users.nom],
+                    prenom = row[Users.prenom],
+                    sexe = row[Users.sexe],
                     email = row[Users.email],
                     hashedPass = row[Users.hashedPass]
                 )
@@ -67,22 +69,33 @@ class UserService {
         Users.deleteWhere { Users.idUser eq id } > 0
     }
 
-    suspend fun login(email: String, password: String): LoginDTO? = transaction {
-        val user = Users
+    suspend fun login(email: String, password: String): LoginResponseDTO? = transaction {
+        val userQuery = Users
             .select { Users.email eq email }
             .map { row ->
-                UsersLoginDTO(
+                // Store the row data in a variable before password verification
+                val userData = LoginResponseDTO(
+                    message = "Connexion réussie",
                     email = row[Users.email],
-                    hashedPass = row[Users.hashedPass],
+                    token = "", // This will be generated in the route
+                    idUser = row[Users.idUser],
+                    firstName = row[Users.prenom],
+                    lastName = row[Users.nom],
+                    gender = row[Users.sexe]
                 )
+
+                // Verify password
+                val passwordVerified = BCrypt.verifyer().verify(
+                    password.toCharArray(),
+                    row[Users.hashedPass]
+                )
+
+                // Return userData only if password is verified
+                if (passwordVerified.verified) userData else null
             }
-            .singleOrNull() ?: return@transaction null
-        val passwordVerified = BCrypt.verifyer().verify(password.toCharArray(), user.hashedPass)
-        if (passwordVerified.verified) {
-            LoginDTO(user.email, user.hashedPass) // Retourne un DTO si l'authentification est valide
-        } else {
-            null // Retourne null si l'utilisateur n'existe pas ou si le mot de passe est incorrect
-        }
+            .singleOrNull()
+
+        userQuery
     }
 
 

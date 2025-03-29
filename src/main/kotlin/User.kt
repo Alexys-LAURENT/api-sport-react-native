@@ -50,7 +50,11 @@ data class LoginDTO(
 data class LoginResponseDTO(
     val message: String,
     val email: String,
-    val token: String
+    val token: String,
+    val idUser: Int,
+    val firstName: String,
+    val lastName: String,
+    val gender: String
 )
 
 @Serializable

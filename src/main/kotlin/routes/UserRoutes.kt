@@ -52,18 +52,16 @@ fun Application.configureUserRoutes() {
                         mapOf("error" to "ID invalide")
                     )
 
-                val user = userService.getById(userId)  // Récupère l'utilisateur par ID
+                val user = userService.getById(userId)
                 if (user != null) {
-                    call.respond(user)
+                    call.respond(HttpStatusCode.OK, user)
                 } else {
-                    // Si l'utilisateur n'est pas trouvé, renvoie une erreur 404
                     call.respond(
                         HttpStatusCode.NotFound,
                         mapOf("error" to "Utilisateur non trouvé")
                     )
                 }
             } catch (e: Exception) {
-                // En cas d'erreur (ex: erreur de base de données), renvoie une erreur 500
                 call.respond(
                     HttpStatusCode.InternalServerError,
                     mapOf("error" to (e.message ?: "Erreur serveur"))
@@ -84,17 +82,12 @@ fun Application.configureUserRoutes() {
                             .withClaim("email", user.email)
                             .withExpiresAt(Date(System.currentTimeMillis() + 60000))
                             .sign(Algorithm.HMAC256("secretToken"))
-                        val response = LoginResponseDTO(
-                            message = "Connexion réussie",
-                            email = user.email,
-                            token = token
-                        )
+
+                        val response = user.copy(token = token)
                         call.respond(HttpStatusCode.OK, response)
                     } else {
                         call.respond(HttpStatusCode.Unauthorized, mapOf("error" to "Email ou mot de passe incorrect"))
                     }
-
-                    call.respond(HttpStatusCode.OK, mapOf("message" to "Connexion réussie", "email" to log.email))
                 } catch (e: Exception) {
                     e.printStackTrace()
                     call.respond(HttpStatusCode.BadRequest, mapOf("error" to (e.message ?: "Erreur inconnue")))
