@@ -1,15 +1,13 @@
 package Services
-import org.jetbrains.exposed.sql.SqlExpressionBuilder.eq
-import org.jetbrains.exposed.sql.select
+
+import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import kotlinx.serialization.Serializable
-
-
-import sport.models.TrainingDTO
 import sport.models.Trainings
 import TrainingTypes
 import org.jetbrains.exposed.sql.update
-
+import java.time.Instant
+import java.time.LocalDateTime
 
 @Serializable
 data class TrainingResponse(
@@ -20,7 +18,6 @@ data class TrainingResponse(
     val icon: String,
     val label: String
 )
-
 
 @Serializable
 data class AllTrainingsResponse(
@@ -60,6 +57,27 @@ class TrainingService {
                 it[Trainings.feeling] = feeling
             }
             updatedRows > 0
+        }
+    }
+
+    suspend fun createTraining(idUser: Int, idTrainingType: Int): Int = transaction {
+        try {
+            val insertStatement = Trainings.insert {
+                it[Trainings.idUser] = idUser
+                it[Trainings.idTrainingType] = idTrainingType
+                it[startedDate] = Instant.now()
+                it[endedDate] = null
+                it[calories] = null
+                it[difficulty] = null
+                it[feeling] = null
+                it[distance] = null
+            }
+
+            insertStatement.resultedValues?.firstOrNull()?.get(Trainings.idTraining)
+                ?: throw Exception("Impossible d'insérer l'entraînement")
+        } catch (e: Exception) {
+            println("Détails de l'erreur : ${e.message}")
+            throw Exception("Erreur lors de la création de l'entraînement : ${e.message}")
         }
     }
 }

@@ -9,7 +9,14 @@ import kotlinx.serialization.Serializable
 import sport.models.TrainingDTO
 import io.ktor.server.request.*
 
-// Ajout de la data class pour le corps de la requête
+// Data class for creating a new training
+@Serializable
+data class CreateTrainingRequest(
+    val idUser: Int,
+    val idTrainingType: Int
+)
+
+// Data class for updating a training
 @Serializable
 data class UpdateTrainingRequest(
     val difficulty: String,
@@ -21,6 +28,45 @@ fun Application.configureTrainingRoutes() {
 
     routing {
         route("/api/trainings") {
+            post("/create") {
+                try {
+                    val createRequest = call.receive<CreateTrainingRequest>()
+
+                    // Log received data
+                    println("Received training creation request:")
+                    println("User ID: ${createRequest.idUser}")
+                    println("Training Type ID: ${createRequest.idTrainingType}")
+
+                    // Valider les données d'entrée
+                    if (createRequest.idUser <= 0 || createRequest.idTrainingType <= 0) {
+                        println("Invalid input data")
+                        call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Données invalides"))
+                        return@post
+                    }
+
+                    // Créer l'entraînement via le service
+                    val newTrainingId = trainingService.createTraining(
+                        createRequest.idUser,
+                        createRequest.idTrainingType
+                    )
+
+                    // Répondre avec l'ID du nouvel entraînement
+                    call.respond(HttpStatusCode.Created, mapOf("id" to newTrainingId))
+                } catch (e: Exception) {
+                    // Log full stack trace
+                    e.printStackTrace()
+
+                    println("Detailed error message: ${e.message}")
+                    println("Error cause: ${e.cause}")
+
+                    call.respond(
+                        HttpStatusCode.InternalServerError,
+                        mapOf("error" to "Erreur de création de l'entraînement", "details" to (e.message ?: "Unknown error"))
+                    )
+                }
+            }
+
+
             // Récupérer les entraînements d'un utilisateur avec une limite
             get("{id}") {
                 val id = call.parameters["id"]?.toIntOrNull()
@@ -45,6 +91,7 @@ fun Application.configureTrainingRoutes() {
 
                 val updateRequest = call.receive<UpdateTrainingRequest>()
                 System.out.println(updateRequest)
+
                 if (updateRequest.difficulty.isBlank()) {
                     call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Données invalides"))
                     return@put

@@ -3,7 +3,6 @@ package sport.models
 import kotlinx.serialization.Serializable
 import org.jetbrains.exposed.sql.Table
 import org.jetbrains.exposed.sql.javatime.timestamp
-import sport.models.Users
 
 object Trainings : Table("trainings") {
     val idTraining = integer("id_training").autoIncrement()
@@ -12,7 +11,7 @@ object Trainings : Table("trainings") {
     val startedDate = timestamp("started_date")
     val endedDate = timestamp("ended_date").nullable()
     val calories = integer("calories").nullable()
-    val difficulty = varchar("difficulty", 20).check {
+    val difficulty = varchar("difficulty", 20).nullable().check {
         it inList listOf("très facile", "facile", "modéré", "difficile", "très difficile")
     }
     val feeling = text("feeling").nullable()
@@ -27,10 +26,9 @@ data class TrainingDTO(
     val idUser: Int,
     val idTrainingType: Int,
     val startedDate: String,
-    val endedDate: String,
+    val endedDate: String?,
     val calories: Int?,
     val difficulty: String?,
     val feeling: String?,
     val distance: Float?
 )
-
