@@ -70,9 +70,15 @@ fun Application.configureTrainingRoutes() {
             // Récupérer les entraînements d'un utilisateur avec une limite
             get("{id}") {
                 val id = call.parameters["id"]?.toIntOrNull()
-                val limit = call.request.queryParameters["limit"]?.toIntOrNull() ?: 5 // Par défaut 5
+                val limit = call.request.queryParameters["limit"]?.toIntOrNull()
 
-                val trainings = id?.let { trainingService.getAllTrainingsByUserId(it, limit) }
+                val trainings = id?.let {
+                    if (limit != null) {
+                        trainingService.getAllTrainingsByUserId(it, limit)
+                    } else {
+                        trainingService.getAllTrainingsByUserId(it)
+                    }
+                }
 
                 if (trainings != null) {
                     call.respond(trainings)

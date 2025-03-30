@@ -15,16 +15,41 @@ fun Application.configureGeoRoutes() {
     routing {
         route("/api/geo") {
             // Créer un point géographique
+            // Créer un point géographique
+            // Créer un point géographique
             post {
                 try {
+                    println("🔵 [GeoRoutes] POST /api/geo - Début de la requête")
+
+                    // Log de l'en-tête de la requête
+                    println("🔵 [GeoRoutes] Headers: ${call.request.headers.entries().joinToString { "${it.key}: ${it.value}" }}")
+
+                    // Lire le corps une seule fois et le convertir en DTO
                     val dto = call.receive<GeoDTO>()
+
+                    // Log du DTO après désérialisation
+                    println("🔵 [GeoRoutes] DTO reçu: $dto")
+
+                    // Log avant l'appel du service
+                    println("🔵 [GeoRoutes] Appel du service geoService.create()")
                     val created = geoService.create(dto)
+
+                    // Log du résultat du service
+                    println("🔵 [GeoRoutes] Résultat du service: $created")
+
+                    // Réponse au client
                     call.respond(HttpStatusCode.Created, created)
+                    println("🔵 [GeoRoutes] POST /api/geo - Réponse envoyée avec succès: ${HttpStatusCode.Created}")
                 } catch (e: Exception) {
+                    // Log détaillé de l'erreur
+                    println("🔴 [GeoRoutes] POST /api/geo - Erreur: ${e.message}")
+                    println("🔴 [GeoRoutes] Stacktrace: ${e.stackTraceToString()}")
+
                     call.respond(
                         HttpStatusCode.BadRequest,
                         mapOf("error" to (e.message ?: "Erreur lors de la création"))
                     )
+                    println("🔴 [GeoRoutes] POST /api/geo - Réponse d'erreur envoyée: ${HttpStatusCode.BadRequest}")
                 }
             }
 

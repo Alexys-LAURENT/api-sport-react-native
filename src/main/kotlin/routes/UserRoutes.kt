@@ -122,6 +122,8 @@ fun Application.configureUserRoutes() {
                     val dto = call.receive<UsersDTO>()
                     val isUpdated = userService.update(id, dto)
 
+                    println("isUpdated: $isUpdated")
+
                     if (isUpdated) {
                         call.respond(HttpStatusCode.OK, "Utilisateur mis à jour avec succès")
                     } else {

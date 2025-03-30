@@ -59,8 +59,9 @@ class UserService {
         Users.update({ Users.idUser eq id }) {
             it[nom] = dto.nom
             it [prenom] = dto.prenom
-            it[email] = dto.email
+            it [email] = dto.email
             it [hashedPass] = dto.hashedPass
+            it [sexe] = dto.sexe
         } > 0
     }
 

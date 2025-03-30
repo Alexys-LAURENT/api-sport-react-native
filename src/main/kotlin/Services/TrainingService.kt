@@ -25,10 +25,36 @@ data class AllTrainingsResponse(
 )
 
 class TrainingService {
+    suspend fun getAllTrainingsByUserId(userId: Int): AllTrainingsResponse = transaction {
+        // Récupérer tous les trainings de l'utilisateur avec une limite
+        val trainingsData = Trainings
+            .select { Trainings.idUser eq userId }
+            .orderBy(Trainings.startedDate, SortOrder.DESC)
+            .map { row ->
+                val idTrainingType = row[Trainings.idTrainingType]
+
+                // Récupérer les données du type de training
+                val trainingTypeData = TrainingTypes.select { TrainingTypes.idTrainingType eq idTrainingType }
+                    .singleOrNull()
+
+                TrainingResponse(
+                    idTraining = row[Trainings.idTraining],
+                    calories = row[Trainings.calories],
+                    startedDate = row[Trainings.startedDate].toString(),
+                    endedDate = row[Trainings.endedDate]?.toString() ?: "",
+                    label = trainingTypeData?.get(TrainingTypes.label) ?: "",
+                    icon = trainingTypeData?.get(TrainingTypes.icon) ?: ""
+                )
+            }
+
+        AllTrainingsResponse(trainings = trainingsData)
+    }
+
     suspend fun getAllTrainingsByUserId(userId: Int, limit: Int): AllTrainingsResponse = transaction {
         // Récupérer tous les trainings de l'utilisateur avec une limite
         val trainingsData = Trainings
             .select { Trainings.idUser eq userId }
+            .orderBy(Trainings.startedDate, SortOrder.DESC)
             .limit(limit)
             .map { row ->
                 val idTrainingType = row[Trainings.idTrainingType]
@@ -55,6 +81,7 @@ class TrainingService {
             val updatedRows = Trainings.update({ Trainings.idTraining eq id }) {
                 it[Trainings.difficulty] = difficulty
                 it[Trainings.feeling] = feeling
+                it[Trainings.endedDate] = Instant.now()
             }
             updatedRows > 0
         }

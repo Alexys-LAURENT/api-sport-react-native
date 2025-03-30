@@ -20,7 +20,6 @@ class GeoService {
             ?: throw Exception("Échec de la création du point géographique")
 
         GeoDTO(
-            idGeo = row[Geo.idGeo],
             idTraining = row[Geo.idTraining],
             date = row[Geo.date].toString(),
             localization = row[Geo.localization]
@@ -32,7 +31,6 @@ class GeoService {
         Geo.select { Geo.idGeo eq id }
             .map { row ->
                 GeoDTO(
-                    idGeo = row[Geo.idGeo],
                     idTraining = row[Geo.idTraining],
                     date = row[Geo.date].toString(),
                     localization = row[Geo.localization]
@@ -46,7 +44,6 @@ class GeoService {
         Geo.select { Geo.idTraining eq trainingId }
             .map { row ->
                 GeoDTO(
-                    idGeo = row[Geo.idGeo],
                     idTraining = row[Geo.idTraining],
                     date = row[Geo.date].toString(),
                     localization = row[Geo.localization]

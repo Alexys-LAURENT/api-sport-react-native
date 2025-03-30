@@ -16,8 +16,7 @@ object Geo : Table("geo") {
 
 @Serializable
 data class GeoDTO(
-    val idGeo: Int = 0,
     val idTraining: Int,
-    val date: String,  // Format ISO 8601 (ex: "2024-02-06T12:00:00Z")
-    val localization: String  // JSON string des coordonnées
+    val date: String,  // Comme une chaîne JSON
+    val localization: String  // Comme une chaîne JSON
 )
