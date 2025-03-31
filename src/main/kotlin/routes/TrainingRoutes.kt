@@ -20,6 +20,7 @@ data class CreateTrainingRequest(
 @Serializable
 data class UpdateTrainingRequest(
     val difficulty: String,
+    val calories: Int,
     val feeling: String? = null
 )
 
@@ -103,7 +104,7 @@ fun Application.configureTrainingRoutes() {
                     return@put
                 }
 
-                val updated = trainingService.updateTraining(id, updateRequest.difficulty, updateRequest.feeling)
+                val updated = trainingService.updateTraining(id, updateRequest.difficulty, updateRequest.calories, updateRequest.feeling)
                 if (updated) {
                     call.respond(HttpStatusCode.OK, mapOf("message" to "Entraînement mis à jour"))
                 } else {
