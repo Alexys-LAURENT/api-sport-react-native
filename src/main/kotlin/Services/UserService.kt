@@ -10,7 +10,7 @@ import at.favre.lib.crypto.bcrypt.BCrypt
 class UserService {
     // Créer un utilisateur
     suspend fun create(dto: SignInDTO): UsersDTO = transaction {
-        println(dto)
+
         val hashedPassword = BCrypt.withDefaults().hashToString(12, dto.hashedPass.toCharArray())
         val insertStatement = Users.insert {
             it[nom] = dto.nom

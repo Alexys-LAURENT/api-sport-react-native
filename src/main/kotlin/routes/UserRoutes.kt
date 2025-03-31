@@ -74,10 +74,10 @@ fun Application.configureUserRoutes() {
                 try {
                     val log = call.receive<LoginDTO>()
                     val user = userService.login(log.email, log.hashedPass)
-                    println("Requête reçue: email=${log.email}, hashedPass=${log.hashedPass}")
+
 
                     if (user != null) {
-                        println("user != null")
+
                         val token = JWT.create()
                             .withClaim("email", user.email)
                             .withExpiresAt(Date(System.currentTimeMillis() + 60000))
@@ -121,8 +121,7 @@ fun Application.configureUserRoutes() {
 
                     val dto = call.receive<UsersDTO>()
                     val isUpdated = userService.update(id, dto)
-
-                    println("isUpdated: $isUpdated")
+                    
 
                     if (isUpdated) {
                         call.respond(HttpStatusCode.OK, "Utilisateur mis à jour avec succès")

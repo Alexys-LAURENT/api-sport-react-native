@@ -33,11 +33,6 @@ fun Application.configureTrainingRoutes() {
                 try {
                     val createRequest = call.receive<CreateTrainingRequest>()
 
-                    // Log received data
-                    println("Received training creation request:")
-                    println("User ID: ${createRequest.idUser}")
-                    println("Training Type ID: ${createRequest.idTrainingType}")
-
                     // Valider les données d'entrée
                     if (createRequest.idUser <= 0 || createRequest.idTrainingType <= 0) {
                         println("Invalid input data")
@@ -97,7 +92,7 @@ fun Application.configureTrainingRoutes() {
                 }
 
                 val updateRequest = call.receive<UpdateTrainingRequest>()
-                System.out.println(updateRequest)
+
 
                 if (updateRequest.difficulty.isBlank()) {
                     call.respond(HttpStatusCode.BadRequest, mapOf("error" to "Données invalides"))
