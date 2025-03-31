@@ -103,6 +103,14 @@ fun Application.configureUserRoutes() {
                     call.respond(HttpStatusCode.BadRequest, "ID invalide")
                 }
 
+                val isDeleted = id?.let { userService.delete(it) }
+
+                if (isDeleted == true) {
+                    call.respond(HttpStatusCode.OK, mapOf("success" to true))
+                }else{
+                    call.respond(HttpStatusCode.NotFound, mapOf("error" to true))
+                }
+
 
             }
 
