@@ -41,6 +41,14 @@ data class DailyCaloriesResponse(
     val calories: Int
 )
 
+// Classe de données pour simplifier la manipulation
+data class TrainingData(
+    val typeName: String,
+    val dateString: String,
+    val color: String,
+    val icon: String
+)
+
 class DashBoardService {
     // Créer un point géographique
     suspend fun getMonthlyCalories(idUser: Int, month: Int, year: Int): MonthlyCaloriesResponse = transaction {
@@ -79,28 +87,40 @@ class DashBoardService {
     suspend fun getTrainingTypesByMonth(idUser: Int, month: Int, year: Int): MonthlyTrainingTypesResponse = transaction {
         // Récupérer les données avec le champ color
         val trainings = (Trainings innerJoin TrainingTypes)
-            .slice(TrainingTypes.label, Trainings.startedDate, TrainingTypes.color)
+            .slice(TrainingTypes.label, Trainings.startedDate, TrainingTypes.color, TrainingTypes.icon)
             .select { Trainings.idUser eq idUser }
             .map { row ->
                 val timestamp = row[Trainings.startedDate]
                 val dateString = timestamp.toString()
                 val typeName = row[TrainingTypes.label]
                 val color = row[TrainingTypes.color]
+                val icon = row[TrainingTypes.icon]
 
-                Triple(typeName, dateString, color)
+                TrainingData(typeName, dateString, color, icon)
             }
 
         // Formatage du mois avec deux chiffres
         val formattedMonth = month.toString().padStart(2, '0')
         val yearMonth = "$year-$formattedMonth"
 
-        // Filtrez et comptez en mémoire
+        // Filtrez et comptez en mémoire en utilisant une approche plus robuste pour l'extraction de la date
         val results = trainings
-            .filter { (_, dateString, _) -> dateString.substring(0, 7) == yearMonth }
-            .groupBy { it.first }  // Grouper par nom de type
+            .filter { training ->
+                // Extraction de l'année et du mois à partir de la chaîne de date
+                val parts = training.dateString.split(" ")[0].split("-")
+                if (parts.size >= 2) {
+                    val extractedYear = parts[0]
+                    val extractedMonth = parts[1]
+                    "$extractedYear-$extractedMonth" == yearMonth
+                } else {
+                    false
+                }
+            }
+            .groupBy { it.typeName }  // Grouper par nom de type
             .map { (type, list) ->
-                // Prendre la première couleur de la liste, supposant que toutes les couleurs sont identiques pour un type donné
-                val color = list.first().third
+                // Prendre la première couleur et icône de la liste
+                val color = list.first().color
+                val icon = list.first().icon
                 TrainingTypeCount(type = type, count = list.size, color = color)
             }
 
@@ -174,13 +194,21 @@ class DashBoardService {
             .mapNotNull { row ->
                 val startDate = row[Trainings.startedDate]
                 val endDate = row[Trainings.endedDate] ?: return@mapNotNull null
-
-                // Vérifier si l'entraînement appartient au mois demandé
                 val startDateStr = startDate.toString()
-                if (startDateStr.substring(0, 7) == yearMonth) {
-                    // Calculer la durée en heures
-                    val duration = endDate.toEpochMilli() - startDate.toEpochMilli()
-                    duration.toDouble() / (1000 * 60 * 60)
+
+                // Extraction de l'année et du mois à partir de la chaîne de date
+                val dateParts = startDateStr.split(" ")[0].split("-")
+                if (dateParts.size >= 2) {
+                    val extractedYear = dateParts[0]
+                    val extractedMonth = dateParts[1]
+
+                    if ("$extractedYear-$extractedMonth" == yearMonth) {
+                        // Calculer la durée en heures
+                        val duration = endDate.toEpochMilli() - startDate.toEpochMilli()
+                        duration.toDouble() / (1000 * 60 * 60)
+                    } else {
+                        null
+                    }
                 } else {
                     null
                 }
