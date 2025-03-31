@@ -111,6 +111,22 @@ fun Application.configureTrainingRoutes() {
                     call.respond(HttpStatusCode.NotFound, mapOf("error" to "Entraînement non trouvé"))
                 }
             }
+
+            // Mettre à jour un entraînement par ID
+            put("end/{id}") {
+                val id = call.parameters["id"]?.toIntOrNull()
+                if (id == null) {
+                    call.respond(HttpStatusCode.BadRequest, mapOf("error" to "ID invalide"))
+                    return@put
+                }
+
+                val isSetFinished = trainingService.endTraining(id)
+                if (isSetFinished) {
+                    call.respond(HttpStatusCode.OK, mapOf("message" to "Entraînement terminé"))
+                } else {
+                    call.respond(HttpStatusCode.NotFound, mapOf("error" to "Entraînement non terminé"))
+                }
+            }
         }
     }
 }

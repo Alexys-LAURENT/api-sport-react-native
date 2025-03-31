@@ -81,7 +81,15 @@ class TrainingService {
             val updatedRows = Trainings.update({ Trainings.idTraining eq id }) {
                 it[Trainings.difficulty] = difficulty
                 it[Trainings.feeling] = feeling
-                it[Trainings.calories] = if (calories > 0) calories else null
+                it[Trainings.calories] = if (calories >= 0) calories else null
+            }
+            updatedRows > 0
+        }
+    }
+
+    suspend fun endTraining(id: Int): Boolean {
+        return transaction {
+            val updatedRows = Trainings.update({ Trainings.idTraining eq id }) {
                 it[Trainings.endedDate] = Instant.now()
             }
             updatedRows > 0
